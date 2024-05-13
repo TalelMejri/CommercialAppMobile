@@ -15,6 +15,7 @@ class CommandeController extends Controller
             "type" => $request->type,
             "qte" => $request->qte,
             "IdClient" => $request->IdClient,
+            "status" => "Pending",
         ]);
         $userSend = User::find($request->IdClient);
         $userCommercial = User::where("role", "Commercial")->first();

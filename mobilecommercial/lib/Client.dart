@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mobilecommercial/HistoriqueCommandeClient.dart';
 import 'package:mobilecommercial/Models/user.dart';
 import 'package:mobilecommercial/list_achat.dart';
 import 'package:mobilecommercial/login.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
-
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class ClientPage extends StatefulWidget {
   final User? user;
@@ -17,7 +18,8 @@ class _ClientPageState extends State<ClientPage> {
   AuthService auth = AuthService();
 
   Future<void> _logout() async {
-    await auth.logout();
+    auth.logout();
+    auth.getUserFromStorage();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
@@ -27,8 +29,14 @@ class _ClientPageState extends State<ClientPage> {
         context, MaterialPageRoute(builder: (BuildContext) => ListAchat()));
   }
 
+  int _selectIndex = 1;
+  void changeSelectedINdex(int index) {
+    setState(() {
+      _selectIndex = index;
+    });
+  }
+
   void _viewHistory() {
-    // Implement your view history logic here
     print("Viewing history!");
   }
 
@@ -45,7 +53,6 @@ class _ClientPageState extends State<ClientPage> {
                   _logout();
                   break;
                 case 'Settings':
-                  // Navigate to settings page
                   break;
               }
             },
@@ -63,37 +70,59 @@ class _ClientPageState extends State<ClientPage> {
             },
             child: Row(
               children: [
+                ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: Icon(Icons.notification_add_rounded),
+                    label: Text("")),
                 CircleAvatar(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
-                  child: Text(widget.user!.name[0]
-                      .toUpperCase()), // Display the first letter
+                  child: Text(widget.user!.name[0].toUpperCase()),
                 ),
-                SizedBox(width: 8),
-                Text(widget.user!.name),
               ],
             ),
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext) => ListAchat()));
-              },
-              child: Text("Passer une commande"),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CurvedNavigationBar(
+          color: const Color(0xFF9E653B),
+          buttonBackgroundColor: const Color(0xFF9E653B),
+          backgroundColor: Colors.white,
+          animationCurve: Curves.easeInOut,
+          animationDuration: const Duration(milliseconds: 600),
+          onTap: (index) {
+            changeSelectedINdex(index);
+          },
+          index: _selectIndex,
+          items: <Widget>[
+            Icon(
+              Icons.list,
+              color: Colors.white,
             ),
-            ElevatedButton(
-              onPressed: _viewHistory,
-              child: Text("Consulter historique d'achat"),
+            Icon(
+              Icons.history,
+              color: Colors.white,
             ),
-          ],
-        ),
-      ),
+          ]),
+      body: _selectIndex == 0 ? ListAchat() : ListHistoriqueCmmande(),
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: <Widget>[
+      //       ElevatedButton(
+      //         onPressed: () {
+      //           Navigator.push(context,
+      //               MaterialPageRoute(builder: (BuildContext) => ListAchat()));
+      //         },
+      //         child: Text("Passer une commande"),
+      //       ),
+      //       ElevatedButton(
+      //         onPressed: _viewHistory,
+      //         child: Text("Consulter historique d'achat"),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

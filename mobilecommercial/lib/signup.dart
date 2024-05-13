@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 
-
-import 'login.dart'; // Make sure this points to your LoginPage class correctly.
+import 'login.dart'; 
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -17,19 +16,25 @@ class _SignupPageState extends State<SignupPage> {
   String password = "";
   String phone = "";
   AuthService auth = AuthService();
+  final _formKey = GlobalKey<FormState>();
+  bool Hidden = true;
+
   Future<void> _signUp() async {
-    try {
-      final registerOk =
-          await auth.RegisterUser(username, email, password, phone);
-      if (registerOk) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Invalid Credentials"), backgroundColor: Colors.red));
+    if (_formKey.currentState!.validate()) {
+      try {
+        final registerOk =
+            await auth.RegisterUser(username, email, password, phone);
+        if (registerOk) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Invalid Credentials"),
+              backgroundColor: Colors.red));
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -41,120 +46,188 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const SizedBox(height: 60.0),
-              const SizedBox(height: 20.0),
-
-              TextField(
-                onChanged: (val) {
-                  setState(() {
-                    username = val;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: "name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide.none,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'images/pngtree.jpg',
+                height: 200,
+                width: 200,
+              ),
+              const Padding(
+                  padding: EdgeInsets.only(
+                      top: 1.0, bottom: 2.0, left: 20.0, right: 20.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Create An Account !',
+                          style: TextStyle(
+                              fontSize: 25.0,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ])),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'username is required';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.name,
+                        onChanged: (value){
+                          setState(() {
+                            username = value;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your username',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'email is required';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.emailAddress,
+                       onChanged: (value){
+                          setState(() {
+                            email = value;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your email',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'phone is required';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.phone,
+                       onChanged: (value){
+                          setState(() {
+                            phone = value;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your phone',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        obscureText: Hidden,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'password is required';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          setState(() {
+                            password = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Enter your password',
+                            suffixIcon: IconButton(
+                              icon: Icon(!Hidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  Hidden = !Hidden;
+                                });
+                              },
+                            )),
+                      ),
+                    ),
+                    Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                        child: MaterialButton(
+                          minWidth: double.infinity,
+                          height: 60,
+                          onPressed: () {
+                            _signUp();
+                          },
+                          color: Colors.red,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40)),
+                          child: Text(
+                            "Signup",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: Colors.white),
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Already Have An Account ?',
+                    style: TextStyle(fontSize: 15.0, color: Colors.red),
                   ),
-                  fillColor: Colors.blue.withOpacity(0.1),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.account_balance),
-                ),
-                obscureText: false,
-              ),
-              // Email text field
-              const SizedBox(height: 20.0),
-              const SizedBox(height: 20.0),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (val) {
-                  setState(() {
-                    email = val;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: "email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide.none,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()));
+                    },
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
-                  fillColor: Colors.blue.withOpacity(0.1),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.email),
-                ),
-                obscureText: false,
+                ],
               ),
-              const SizedBox(height: 20.0),
-              // Password text field
-              TextField(
-                onChanged: (val) {
-                  setState(() {
-                    password = val;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: "****",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide.none,
-                  ),
-                  fillColor: Colors.blue.withOpacity(0.1),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.password),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20.0),
-              const SizedBox(height: 20.0),
-              TextField(
-                onChanged: (val) {
-                  setState(() {
-                    phone = val;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: "+216",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide.none,
-                  ),
-                  fillColor: Colors.blue.withOpacity(0.1),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.phone),
-                ),
-                obscureText: false,
-              ),
-              const SizedBox(height: 20.0),
-              // Sign up button
-              ElevatedButton(
-                onPressed: _signUp,
-                child: const Text(
-                  "Sign up",
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-              const SizedBox(height: 20.0),
-              // Already have an account? Login text
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                },
-                child: Text(
-                  "Already have an account? Login",
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline),
-                ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

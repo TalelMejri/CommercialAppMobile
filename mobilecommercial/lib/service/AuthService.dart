@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobilecommercial/Models/Commande.dart';
 import 'package:mobilecommercial/Models/user.dart';
-
 
 class AuthService {
   bool isAuth = false;
@@ -41,6 +41,7 @@ class AuthService {
       final response = await http.post(Uri.parse("$url/RegisterUser"),
           body: jsonEncode(request),
           headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response);
       if (response.statusCode == 201) {
         return true;
       } else {
@@ -57,6 +58,7 @@ class AuthService {
       final response = await http.post(Uri.parse("$url/login"),
           body: jsonEncode(request),
           headers: {"Content-Type": "application/json;charset=utf-8"});
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
         final User user = User.fromJson(data);
@@ -74,10 +76,12 @@ class AuthService {
 
   Future<bool> AddCommande(String type, int id, int qte) async {
     final request = {"type": type, "IdClient": id, "qte": qte};
+    print(request);
     try {
       final response = await http.post(Uri.parse("$url/Addcommande"),
           body: jsonEncode(request),
           headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response.body);
       if (response.statusCode == 201) {
         return true;
       } else {
@@ -85,6 +89,28 @@ class AuthService {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<List<Commande>> GetCommandeById(
+    int id,
+  ) async {
+    try {
+      final response =
+          await http.get(Uri.parse("$url/GetCommandesByClient/$id"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<Commande> commandes = (jsonData as List).map((item) {
+          return Commande.fromJson(item);
+        }).toList();
+        print(commandes);
+        return commandes;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
     }
   }
 }
