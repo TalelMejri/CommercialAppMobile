@@ -35,6 +35,17 @@ class AuthController extends Controller
     //     return response()->json(["message"=>"Employee Created"],201);
     // }
 
+    public function EditProfil(int $id,Request $request){
+        $user=User::find($id);
+        $user->update([
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'phone'=>$request->phone
+        ]);
+
+        return response()->json(["message"=>"User Updated"],200);
+    }
+
     public function login(Request $request){
         if(Auth::attempt(['email'=>$request->email,'password'=>$request->password])){
             $user = Auth::user();

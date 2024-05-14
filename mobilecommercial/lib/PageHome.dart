@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobilecommercial/Client.dart';
+import 'package:mobilecommercial/Models/user.dart';
 import 'package:mobilecommercial/login.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 import 'package:mobilecommercial/signup.dart';
@@ -14,10 +15,11 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   bool auth = false;
   AuthService authService = AuthService();
-
+  late User user;
   void getAuth() async {
     authService.getUserFromStorage().then((value) => setState(() {
           auth = authService.isAuth;
+          user=authService.user!;
         }));
   }
 
@@ -39,12 +41,12 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Future<void> CheckRole () async{
-    if(authService.user.role == "admin"){
+    if(user.role == "admin"){
       // Navigator.push(
       //     context, MaterialPageRoute(builder: (context) => const AdminPage()));
     }else{
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) =>  ClientPage(user: authService.user,)));
+          context, MaterialPageRoute(builder: (context) =>  ClientPage(user: user,)));
     }
   }
 

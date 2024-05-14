@@ -39,7 +39,7 @@ class _ListAchatState extends State<ListAchat> {
               onPressed: () {
                 if (quantity != null && quantity! > 0) {
                   print("dddd");
-                  auth.AddCommande(item['type'], auth.user.id, quantity!);
+                  auth.AddCommande(item['type'], auth.user!.id, quantity!);
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Added With Sucess')));
                   Navigator.of(context).pop();

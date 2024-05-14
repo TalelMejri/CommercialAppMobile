@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobilecommercial/Models/Commande.dart';
+import 'package:mobilecommercial/Models/Notif.dart';
 import 'package:mobilecommercial/Models/user.dart';
 
 class AuthService {
@@ -9,7 +10,7 @@ class AuthService {
   String url = "http://10.0.2.2:8000/api";
   final Storage = FlutterSecureStorage();
 
-  late User user;
+  late User ? user=null;
 
   AuthService() {
     getUserFromStorage();
@@ -113,4 +114,45 @@ class AuthService {
       return [];
     }
   }
+
+   Future<List<Notif>> getNotifById(
+    int id,
+  ) async {
+    try {
+      final response =
+          await http.get(Uri.parse("$url/getNotif/$id"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<Notif> notifs = (jsonData as List).map((item) {
+          return Notif.fromJson(item);
+        }).toList();
+        return notifs;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
+
+  Future<bool> EditProfil (id,email,phone,name) async{
+    final request = {"email":email,"phone":phone,"name":name};
+    try {
+        final response = await http.put(Uri.parse("$url/EditProfil/$id"),
+          body: jsonEncode(request),
+          headers: {"Content-Type": "application/json;charset=utf-8"});
+          print(response.body);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+ 
 }

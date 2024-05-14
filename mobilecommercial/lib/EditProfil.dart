@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:mobilecommercial/Client.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
-import 'package:mobilecommercial/signup.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import 'login.dart';
+
+class EditProfil extends StatefulWidget {
+  const EditProfil({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  _EditProfilState createState() => _EditProfilState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _EditProfilState extends State<EditProfil> {
+  String username = "";
   String email = "";
-  String password = "";
+  String phone = "";
+  int id = -1;
+  AuthService auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool Hidden = true;
-  AuthService auth = AuthService();
-  Future<void> _loginFunction() async {
+
+  Future<void> editAccount() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final loginOk = await auth.LoginUser(email, password);
-        if (loginOk) {
-          if (auth.user!.role == "User") {
-            print("user");
-          } else if (auth.user!.role == "Admin") {
-            print("Admin");
-          }
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ClientPage(user: auth.user)));
+        final editprofil;
+        editprofil = await auth.EditProfil(id, username, email, phone);
+        if (editprofil) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) =>ClientPage(user: auth.user!)));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Invalid Credentials"),
+              content: Text("Somtheing went wrong"),
               backgroundColor: Colors.red));
         }
       } catch (e) {
@@ -42,12 +41,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    auth.getUserFromStorage().then((value) => setState(() {
+          username = auth.user!.name;
+          email = auth.user!.email;
+          phone = auth.user!.phone;
+          id = auth.user!.id;
+        }));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text('Edit Account'),
+        backgroundColor: Colors.red,
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -55,20 +69,15 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                'images/pngtree.jpg',
-                height: 200,
-                width: 200,
-              ),
               const Padding(
                   padding: EdgeInsets.only(
-                      top: 5.0, bottom: 20.0, left: 20.0, right: 20.0),
+                      top: 50.0, bottom: 2.0, left: 20.0, right: 20.0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Welcome Back !',
+                          'Edit Account !',
                           style: TextStyle(
                               fontSize: 25.0,
                               color: Colors.black,
@@ -84,14 +93,38 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 16),
                       child: TextFormField(
+                        initialValue: auth.user!.name,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'username is required';
                           }
                           return null;
                         },
+                        keyboardType: TextInputType.name,
+                        onChanged: (value) {
+                          setState(() {
+                            username = value;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your username',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        initialValue: email,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'email is required';
+                          }
+                          return null;
+                        },
                         keyboardType: TextInputType.emailAddress,
-                      onChanged: (value){
+                        onChanged: (value) {
                           setState(() {
                             email = value;
                           });
@@ -106,33 +139,23 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 16),
                       child: TextFormField(
-                        obscureText: Hidden,
-                        enableSuggestions: false,
-                        autocorrect: false,
+                        initialValue: phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'password is required';
+                            return 'phone is required';
                           }
                           return null;
                         },
-                       onChanged: (value){
+                        keyboardType: TextInputType.phone,
+                        onChanged: (value) {
                           setState(() {
-                            password = value;
+                            phone = value;
                           });
                         },
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Enter your password',
-                            suffixIcon: IconButton(
-                              icon: Icon(!Hidden
-                                  ? Icons.visibility
-                                  : Icons.visibility_off),
-                              onPressed: () {
-                                setState(() {
-                                  Hidden = !Hidden;
-                                });
-                              },
-                            )),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your phone',
+                        ),
                       ),
                     ),
                     Padding(
@@ -141,12 +164,14 @@ class _LoginPageState extends State<LoginPage> {
                         child: MaterialButton(
                           minWidth: double.infinity,
                           height: 60,
-                          onPressed: () {_loginFunction();},
+                          onPressed: () {
+                            editAccount();
+                          },
                           color: Colors.red,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)),
                           child: Text(
-                            "Login",
+                            "Edit",
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -155,30 +180,6 @@ class _LoginPageState extends State<LoginPage> {
                         )),
                   ],
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Don\'t have an account ?',
-                    style: TextStyle(fontSize: 15.0, color: Colors.red),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignupPage()));
-                    },
-                    child: const Text(
-                      ' Sign Up',
-                      style: TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

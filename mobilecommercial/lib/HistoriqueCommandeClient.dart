@@ -16,7 +16,7 @@ class _ListHistoriqueCmmandeState extends State<ListHistoriqueCmmande> {
 
   Future<void> fetchCommandes() async {
     commandes = [];
-    var commandes_get = await auth.GetCommandeById(auth.user.id);
+    var commandes_get = await auth.GetCommandeById(auth.user!.id);
     setState(() {
       commandes = commandes_get;
     });
@@ -43,7 +43,7 @@ class _ListHistoriqueCmmandeState extends State<ListHistoriqueCmmande> {
                   subtitle: Text(item.status.toString()),
                   trailing: ElevatedButton.icon(
                     onPressed: () {},
-                    icon: Icon(Icons.delete),
+                    icon:  Icon(Icons.delete),
                     label: Text(""),
                   ),
                 );

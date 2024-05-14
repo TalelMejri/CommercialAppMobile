@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobilecommercial/Client.dart';
+
 import 'package:mobilecommercial/Loading.dart';
 import 'package:mobilecommercial/PageHome.dart';
-import 'package:mobilecommercial/login.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 
 void main() {

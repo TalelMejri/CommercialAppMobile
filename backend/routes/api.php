@@ -31,3 +31,4 @@ Route::get("/GetCommandesPendig", [CommandeController::class, "GetCommandesPendi
 Route::get("/GetCommandesAccepted", [CommandeController::class, "GetCommandesAccepted"]);
 Route::get("/GetCommandesByClient/{id}", [CommandeController::class, "GetCommandesByClient"]);
 Route::get("/getNotif/{id}", [NotifController::class, "getNotif"]);
+Route::put("/EditProfil/{id}", [AuthController::class, "EditProfil"]);

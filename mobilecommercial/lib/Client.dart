@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobilecommercial/EditProfil.dart';
 import 'package:mobilecommercial/HistoriqueCommandeClient.dart';
+import 'package:mobilecommercial/Models/Notif.dart';
 import 'package:mobilecommercial/Models/user.dart';
 import 'package:mobilecommercial/list_achat.dart';
 import 'package:mobilecommercial/login.dart';
@@ -16,7 +18,7 @@ class ClientPage extends StatefulWidget {
 
 class _ClientPageState extends State<ClientPage> {
   AuthService auth = AuthService();
-
+  List<Notif> notifs = [];
   Future<void> _logout() async {
     auth.logout();
     auth.getUserFromStorage();
@@ -36,52 +38,90 @@ class _ClientPageState extends State<ClientPage> {
     });
   }
 
+  Future<void> fetchNotif() async {
+    notifs = [];
+    var notif_get = await auth.getNotifById(auth.user!.id);
+    setState(() {
+      notifs = notif_get;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    auth.getUserFromStorage().then((value) => fetchNotif());
+  }
+
   void _viewHistory() {
     print("Viewing history!");
+  }
+
+  void _showNotificationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Notifications'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: notifs.map((notif) {
+                return ListTile(
+                  title: Text(notif.message),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.user!.name),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'Logout':
-                  _logout();
-                  break;
-                case 'Settings':
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  value: 'Settings',
-                  child: Text('Paramètres du compte'),
-                ),
-                PopupMenuItem(
-                  value: 'Logout',
-                  child: Text('Déconnexion'),
-                ),
-              ];
-            },
-            child: Row(
-              children: [
-                ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.notification_add_rounded),
-                    label: Text("")),
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  child: Text(widget.user!.name[0].toUpperCase()),
-                ),
-              ],
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: Text(widget.user!.name),
+            accountEmail: Text(widget.user!.email),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(widget.user!.name[0].toUpperCase()),
             ),
           ),
+          ListTile(
+            title: Text("Paramètres du compte"),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext) => EditProfil()));
+            },
+          ),
+          ListTile(
+            title: Text("Déconnexion"),
+            onTap: () {
+              _logout();
+            },
+          ),
+        ],
+      )),
+      appBar: AppBar(
+        title: Text("Client"),
+        actions: [
+          ElevatedButton.icon(
+              onPressed: () {
+                _showNotificationDialog();
+              },
+              icon: Icon(Icons.notification_add_rounded),
+              label: Text("")),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
