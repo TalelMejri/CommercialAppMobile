@@ -146,23 +146,7 @@ class _ClientPageState extends State<ClientPage> {
             ),
           ]),
       body: _selectIndex == 0 ? ListAchat() : ListHistoriqueCmmande(),
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: <Widget>[
-      //       ElevatedButton(
-      //         onPressed: () {
-      //           Navigator.push(context,
-      //               MaterialPageRoute(builder: (BuildContext) => ListAchat()));
-      //         },
-      //         child: Text("Passer une commande"),
-      //       ),
-      //       ElevatedButton(
-      //         onPressed: _viewHistory,
-      //         child: Text("Consulter historique d'achat"),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+     
     );
   }
 }

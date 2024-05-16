@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobilecommercial/Client.dart';
+import 'package:mobilecommercial/Commercial.dart';
 import 'package:mobilecommercial/Models/user.dart';
 import 'package:mobilecommercial/login.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
@@ -19,7 +20,7 @@ class _LandingPageState extends State<LandingPage> {
   void getAuth() async {
     authService.getUserFromStorage().then((value) => setState(() {
           auth = authService.isAuth;
-          user=authService.user!;
+          user = authService.user!;
         }));
   }
 
@@ -40,13 +41,17 @@ class _LandingPageState extends State<LandingPage> {
     getAuth();
   }
 
-  Future<void> CheckRole () async{
-    if(user.role == "admin"){
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (context) => const AdminPage()));
-    }else{
+  Future<void> CheckRole() async {
+    if (authService.user!.role == "Commercial") {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => CommercialPage(user: user)));
+    } else if(authService.user!.role == "User") {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) =>  ClientPage(user: user,)));
+          context,
+          MaterialPageRoute(
+              builder: (context) => ClientPage(
+                    user: user,
+                  )));
     }
   }
 
@@ -88,7 +93,7 @@ class _LandingPageState extends State<LandingPage> {
                   Visibility(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                         CheckRole();
+                        CheckRole();
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.white,

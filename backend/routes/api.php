@@ -30,5 +30,12 @@ Route::delete("/DeleteCommande/{id}", [CommandeController::class, "DeleteCommand
 Route::get("/GetCommandesPendig", [CommandeController::class, "GetCommandesPendig"]);
 Route::get("/GetCommandesAccepted", [CommandeController::class, "GetCommandesAccepted"]);
 Route::get("/GetCommandesByClient/{id}", [CommandeController::class, "GetCommandesByClient"]);
+Route::get("/getCommandesNotAccepted", [CommandeController::class, "getCommandesNotAccepted"]);
 Route::get("/getNotif/{id}", [NotifController::class, "getNotif"]);
 Route::put("/EditProfil/{id}", [AuthController::class, "EditProfil"]);
+Route::delete("/DeleteUser/{id}", [AuthController::class, "DeleteUser"]);
+Route::get("/getAllEmploye", [AuthController::class, "getEmploye"]);
+
+
+
+

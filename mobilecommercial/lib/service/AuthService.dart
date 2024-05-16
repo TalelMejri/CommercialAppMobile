@@ -10,7 +10,7 @@ class AuthService {
   String url = "http://10.0.2.2:8000/api";
   final Storage = FlutterSecureStorage();
 
-  late User ? user=null;
+  late User? user = null;
 
   AuthService() {
     getUserFromStorage();
@@ -40,6 +40,29 @@ class AuthService {
     };
     try {
       final response = await http.post(Uri.parse("$url/RegisterUser"),
+          body: jsonEncode(request),
+          headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response);
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> AddEmploye(
+      String nom, String email, String password, String phone) async {
+    final request = {
+      "name": nom,
+      "email": email,
+      "password": password,
+      "phone": phone
+    };
+    try {
+      final response = await http.post(Uri.parse("$url/AddEmployee"),
           body: jsonEncode(request),
           headers: {"Content-Type": "application/json;charset=utf-8"});
       print(response);
@@ -115,12 +138,47 @@ class AuthService {
     }
   }
 
-   Future<List<Notif>> getNotifById(
+  Future<List<Commande>> GetCommandesPendig() async {
+    try {
+      final response = await http.get(Uri.parse("$url/GetCommandesPendig"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<Commande> commandes = (jsonData as List).map((item) {
+          return Commande.fromJson(item);
+        }).toList();
+        return commandes;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
+   Future<List<Commande>> getCommandesNotAccepted() async {
+    try {
+      final response = await http.get(Uri.parse("$url/getCommandesNotAccepted"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<Commande> commandes = (jsonData as List).map((item) {
+          return Commande.fromJson(item);
+        }).toList();
+        return commandes;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
+  Future<List<Notif>> getNotifById(
     int id,
   ) async {
     try {
-      final response =
-          await http.get(Uri.parse("$url/getNotif/$id"));
+      final response = await http.get(Uri.parse("$url/getNotif/$id"));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<Notif> notifs = (jsonData as List).map((item) {
@@ -136,14 +194,29 @@ class AuthService {
     }
   }
 
-
-  Future<bool> EditProfil (id,email,phone,name) async{
-    final request = {"email":email,"phone":phone,"name":name};
+  Future<List<User>> getAllEmploye() async{
     try {
-        final response = await http.put(Uri.parse("$url/EditProfil/$id"),
-          body: jsonEncode(request),
+      final response = await http.get(Uri.parse("$url/getAllEmploye"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body)['data'];
+        List<User> users = (jsonData as List).map((item) {
+          return User.fromJson(item);
+        }).toList();
+        return users;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
+  Future<bool> DeleteEmploye(id) async {
+    try {
+      final response = await http.delete(Uri.parse("$url/DeleteUser/$id"),
           headers: {"Content-Type": "application/json;charset=utf-8"});
-          print(response.body);
+      print(response.body);
       if (response.statusCode == 200) {
         return true;
       } else {
@@ -154,5 +227,56 @@ class AuthService {
       return false;
     }
   }
- 
+
+  Future<bool> EditProfil(id, email, phone, name) async {
+    final request = {"email": email, "phone": phone, "name": name};
+    try {
+      final response = await http.put(Uri.parse("$url/EditProfil/$id"),
+          body: jsonEncode(request),
+          headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response.body);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> DeleteCommande(id) async {
+    try {
+      final response = await http.delete(Uri.parse("$url/DeleteCommande/$id"),
+          headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response.body);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> ChangerEtatCommande(id, String status) async {
+    final request = {"status": status};
+    try {
+      final response = await http.put(Uri.parse("$url/ChangerEtatCommande/$id"),
+          body: jsonEncode(request),
+          headers: {"Content-Type": "application/json;charset=utf-8"});
+      print(response.body);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
 }

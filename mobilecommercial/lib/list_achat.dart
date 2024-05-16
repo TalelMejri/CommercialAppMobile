@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
+import 'package:confetti/confetti.dart';
+import 'dart:math';
 
 class ListAchat extends StatefulWidget {
   const ListAchat({Key? key}) : super(key: key);
@@ -14,8 +16,25 @@ class _ListAchatState extends State<ListAchat> {
     {"id": 1, "type": "type1", "prix": 20},
     {"id": 2, "type": "test", "prix": 30},
   ];
-
+  late ConfettiController _centerController;
   AuthService auth = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _centerController = ConfettiController(duration: const Duration(seconds: 5));
+  }
+
+  Future<void> PasseCommande(type, id, qte) async {
+    auth.AddCommande(type, id, qte);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Added With Success'),backgroundColor: Colors.green,));
+    _centerController.play();
+    Future.delayed(const Duration(seconds: 2), () {
+      _centerController.stop();
+    });
+    Navigator.of(context).pop();
+  }
 
   Future<void> ShowMessage(item) async {
     int? quantity;
@@ -38,11 +57,7 @@ class _ListAchatState extends State<ListAchat> {
               child: Text('Envoyer'),
               onPressed: () {
                 if (quantity != null && quantity! > 0) {
-                  print("dddd");
-                  auth.AddCommande(item['type'], auth.user!.id, quantity!);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Added With Sucess')));
-                  Navigator.of(context).pop();
+                  PasseCommande(item['type'], auth.user!.id, quantity!);
                 } else {
                   print('Invalid Quantity');
                 }
@@ -62,23 +77,43 @@ class _ListAchatState extends State<ListAchat> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Expanded(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          height: 20,
+          child: Align(
+            alignment: Alignment.center,
+            child: ConfettiWidget(
+              confettiController: _centerController,
+              blastDirection: pi / 2,
+              maxBlastForce: 5,
+              minBlastForce: 1,
+              emissionFrequency: 0.03,
+              numberOfParticles: 10,
+              gravity: 0,
+            ),
+          ),
+        ),
+        Expanded(
           child: ListView.builder(
-        itemCount: type.length,
-        itemBuilder: (context, index) {
-          final item = type[index];
-          return ListTile(
-            leading: Text(item['id'].toString()),
-            title: Text(item['type'].toString()),
-            subtitle: Text(item['prix'].toString() + " dt"),
-            trailing: ElevatedButton.icon(
-                onPressed: () => ShowMessage(item),
-                icon: Icon(Icons.money),
-                label: Text("")),
-          );
-        },
-      )),
+            itemCount: type.length,
+            itemBuilder: (context, index) {
+              final item = type[index];
+              return ListTile(
+                leading: Text(item['id'].toString()),
+                title: Text(item['type'].toString()),
+                subtitle: Text(item['prix'].toString() + " dt"),
+                trailing: ElevatedButton.icon(
+                  onPressed: () => ShowMessage(item),
+                  icon: Icon(Icons.money),
+                  label: Text(""),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,54 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:mobilecommercial/Client.dart';
+import 'package:mobilecommercial/ListEmploye.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 
 import 'login.dart';
 
-class EditProfil extends StatefulWidget {
-  const EditProfil({Key? key}) : super(key: key);
+class AddEmploye extends StatefulWidget {
+  const AddEmploye({Key? key}) : super(key: key);
 
   @override
-  _EditProfilState createState() => _EditProfilState();
+  _AddEmployeState createState() => _AddEmployeState();
 }
 
-class _EditProfilState extends State<EditProfil> {
+class _AddEmployeState extends State<AddEmploye> {
   String username = "";
   String email = "";
+  String password = "";
   String phone = "";
-  int id = -1;
   AuthService auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool Hidden = true;
 
-  Future<void> editAccount() async {
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final editprofil;
-        editprofil = await auth.EditProfil(id, email, phone,username);
-        if (editprofil) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) =>ClientPage(user: auth.user!)));
+        final registerOk =
+            await auth.AddEmploye(username, email, password, phone);
+        if (registerOk) {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Employe Added"),
+              backgroundColor: Colors.green));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Somtheing went wrong"),
+              content: Text("Invalid Credentials"),
               backgroundColor: Colors.red));
         }
       } catch (e) {
         print(e);
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    auth.getUserFromStorage().then((value) => setState(() {
-          username = auth.user!.name;
-          email = auth.user!.email;
-          phone = auth.user!.phone;
-          id = auth.user!.id;
-        }));
   }
 
   @override
@@ -59,10 +48,6 @@ class _EditProfilState extends State<EditProfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Account'),
-        backgroundColor: Colors.red,
-      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
@@ -77,7 +62,7 @@ class _EditProfilState extends State<EditProfil> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Edit Account !',
+                          'Add Employe',
                           style: TextStyle(
                               fontSize: 25.0,
                               color: Colors.black,
@@ -93,7 +78,6 @@ class _EditProfilState extends State<EditProfil> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 16),
                       child: TextFormField(
-                        initialValue: auth.user!.name,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'username is required';
@@ -116,7 +100,6 @@ class _EditProfilState extends State<EditProfil> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 16),
                       child: TextFormField(
-                        initialValue: email,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'email is required';
@@ -139,7 +122,6 @@ class _EditProfilState extends State<EditProfil> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 16),
                       child: TextFormField(
-                        initialValue: phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'phone is required';
@@ -159,19 +141,52 @@ class _EditProfilState extends State<EditProfil> {
                       ),
                     ),
                     Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: TextFormField(
+                        obscureText: Hidden,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'password is required';
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            password = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Enter your password',
+                            suffixIcon: IconButton(
+                              icon: Icon(!Hidden
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  Hidden = !Hidden;
+                                });
+                              },
+                            )),
+                      ),
+                    ),
+                    Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                         child: MaterialButton(
                           minWidth: double.infinity,
                           height: 60,
                           onPressed: () {
-                            editAccount();
+                            _signUp();
                           },
                           color: Colors.red,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)),
                           child: Text(
-                            "Edit",
+                            "Add",
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,

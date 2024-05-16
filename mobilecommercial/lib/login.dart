@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobilecommercial/Client.dart';
+import 'package:mobilecommercial/Commercial.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 import 'package:mobilecommercial/signup.dart';
 
@@ -22,14 +23,18 @@ class _LoginPageState extends State<LoginPage> {
         final loginOk = await auth.LoginUser(email, password);
         if (loginOk) {
           if (auth.user!.role == "User") {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ClientPage(user: auth.user)));
             print("user");
-          } else if (auth.user!.role == "Admin") {
-            print("Admin");
+          } else if (auth.user!.role == "Commercial") {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CommercialPage(user: auth.user)));
+            print("Commercial");
           }
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ClientPage(user: auth.user)));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Invalid Credentials"),
@@ -91,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                         keyboardType: TextInputType.emailAddress,
-                      onChanged: (value){
+                        onChanged: (value) {
                           setState(() {
                             email = value;
                           });
@@ -115,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           return null;
                         },
-                       onChanged: (value){
+                        onChanged: (value) {
                           setState(() {
                             password = value;
                           });
@@ -141,7 +146,9 @@ class _LoginPageState extends State<LoginPage> {
                         child: MaterialButton(
                           minWidth: double.infinity,
                           height: 60,
-                          onPressed: () {_loginFunction();},
+                          onPressed: () {
+                            _loginFunction();
+                          },
                           color: Colors.red,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)),
