@@ -40,10 +40,13 @@ class CommandeController extends Controller
 
         return response()->json(["message" => "Commande Updated"], 200);
     }
-
+    public function getCommandesNotPending(){
+        $commandes = Commande::where("status", "!=", "Pending")->get();
+        return response()->json($commandes, 200);
+    }
 
     public function getCommandesNotAccepted(){
-        $commandes = Commande::where("status", "!=", "Pending")->get();
+        $commandes = Commande::where("status", "!=", "Accepted")->get();
         return response()->json($commandes, 200);
     }
     public function DeleteCommande(int $id)

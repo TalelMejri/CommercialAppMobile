@@ -156,6 +156,24 @@ class AuthService {
     }
   }
 
+  Future<List<Commande>> GetCommandeAccepted() async {
+    try {
+      final response = await http.get(Uri.parse("$url/GetCommandesAccepted"));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<Commande> commandes = (jsonData as List).map((item) {
+          return Commande.fromJson(item);
+        }).toList();
+        return commandes;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e.toString());
+      return [];
+    }
+  }
+
    Future<List<Commande>> getCommandesNotAccepted() async {
     try {
       final response = await http.get(Uri.parse("$url/getCommandesNotAccepted"));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobilecommercial/Client.dart';
 import 'package:mobilecommercial/Commercial.dart';
+import 'package:mobilecommercial/Employee.dart';
 import 'package:mobilecommercial/service/AuthService.dart';
 import 'package:mobilecommercial/signup.dart';
 
@@ -34,6 +35,11 @@ class _LoginPageState extends State<LoginPage> {
                 MaterialPageRoute(
                     builder: (context) => CommercialPage(user: auth.user)));
             print("Commercial");
+          } else if (auth.user!.role == "Employe") {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => EmployeePage(user: auth.user)));
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
